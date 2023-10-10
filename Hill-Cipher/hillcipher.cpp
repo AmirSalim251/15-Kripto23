@@ -297,6 +297,12 @@ std::string decrypt(std::string ctext,Matrix key,int p,int l){
     return dec;
 }
 
+int gcd(int a, int b)
+{
+    if (a == 0)
+        return b;
+    return gcd(b % a, a);
+}
 // fungsi untuk mencari kunci hill matriks jika diketahui cipher dan plain text saja
 void getKeyMatrix(std::string ptext,std::string ctext,Matrix keyResult,int p,int l){
    Matrix cm,pm,pmi;
@@ -311,22 +317,39 @@ void getKeyMatrix(std::string ptext,std::string ctext,Matrix keyResult,int p,int
     }
    }
 
+    int d;
+    si = 0;
+    while(si<ptext.length()-1 && gcd(d,26)!=1){
     // Mencari invers matriks plaintext
-    int d = determinant(pm,p)%26;
-    
-     if(d<0){
+    int temp = si;
+        for(int i=0;i<l;i++){
+            for(int j=0;j<p;j++){
+                cm[j][i] =(int)(ctext[si]-'A'); 
+                pm[j][i] =(int)(ptext[si]-'A'); 
+                si++;
+            }
+        }
+    printMatrix(pm,p,l);
+    si = temp;
+    si+=2;
+    d = determinant(pm,p)%26;
+        if(d<0){
         d = d+26;
-    }
-    
+        }
+    std::cout<<"GCD"<<gcd(d,26)<<"\n";
 
+
+   
+    }    
+  printMatrix(pm,p,l);
     int i = 1;
-    
 
     adjoint(pm,pmi,p);
     
-    while((d*i)%26!=1){
+    while((d*i)%26!=1 ){
         
         i++;
+        
     }
     MatrixOperation(pmi,i,p,l,'*');
     MatrixOperation(pmi,26,p,l,'%');
@@ -380,14 +403,7 @@ int main(){
 
     std::cout<<"Hasil Enkripsi = "<<enc<<"\n";
     std::cout<<"Hasil Dekripsi = "<<dec<<"\n";
-
-    std::cout<<"=== Pencarian Kunci berdasrkan plain dan cipher text ===\n";
-    std::cout<<"Kunci asli = \n";
-    printMatrix(key,p,l);
-
-    std::cout<<"Proses pencarian = \n";
-    getKeyMatrix(dec,enc,unk,p,l);
-    printMatrix(unk,p,l);
+   
 
     
 
